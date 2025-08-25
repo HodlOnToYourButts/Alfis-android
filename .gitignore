@@ -1,0 +1,28 @@
+# Rust
+target/
+Cargo.lock
+
+# Android
+android/app/build/
+android/app/src/main/jniLibs/
+android/.gradle/
+android/build/
+android/local.properties
+android/.idea/
+*.iml
+
+# Backup files
+*.backup
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary build files
+/tmp/
+build_tmp/
