@@ -188,4 +188,6 @@ This project follows the same contribution guidelines as the main Alfis project.
 
 ## License
 
-Same as the main Alfis project - see the LICENSE file in the main repository.
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0), the same license as the main Alfis project. See the [LICENSE](LICENSE) file for the full license text.
+
+The AGPL-3.0 is a copyleft license that ensures any modifications to this software remain open source and available to the community.
