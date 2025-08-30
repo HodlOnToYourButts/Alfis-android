@@ -16,7 +16,6 @@ class BootReceiver : BroadcastReceiver() {
         
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
-            Intent.ACTION_LOCKED_BOOT_COMPLETED,
             "android.intent.action.QUICKBOOT_POWERON",
             Intent.ACTION_MY_PACKAGE_REPLACED,
             "android.intent.action.PACKAGE_REPLACED" -> {
