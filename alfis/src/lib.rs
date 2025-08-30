@@ -395,7 +395,10 @@ fn start_dns_server_internal(
 
     // Load settings with error handling
     let mut settings = match Settings::load(config_path) {
-        Some(s) => s,
+        Some(s) => {
+            add_log_message("Configuration loaded successfully".to_string());
+            s
+        },
         None => {
             add_log_message("Configuration not found, generating defaults".to_string());
             warn!("Failed to load settings from {}, generating default config", config_path);
@@ -405,8 +408,11 @@ fn start_dns_server_internal(
         }
     };
     
-    // Debug: Log the DNS listen address from config
+    // Debug: Log the loaded configuration details
     add_log_message(format!("Loaded DNS listen address from config: {}", settings.dns.listen));
+    add_log_message(format!("Loaded {} DNS forwarders from config", settings.dns.forwarders.len()));
+    add_log_message(format!("Loaded {} bootstrap DNS servers from config", settings.dns.bootstraps.len()));
+    add_log_message(format!("Loaded {} network peers from config: {:?}", settings.net.peers.len(), settings.net.peers));
     
     // Override settings for Android
     // Note: DNS listen address is taken from config file, no override here
@@ -491,7 +497,7 @@ listen = "[::1]:5353"
 threads = 8
 # Use DoH when available, fallback to regular DNS
 forwarders = ["https://dns.adguard.com/dns-query", "8.8.8.8:53"]
-bootstraps = ["8.8.8.8:53", "1.1.1.1:53"]
+bootstraps = ["94.140.14.14:53", "94.140.15.15:53", "9.9.9.9:53", "149.112.112.112:53", "[2a10:50c0::ad1:ff]:53", "[2a10:50c0::ad2:ff]:53", "[2620:fe::fe]:53", "[2620:fe::9]:53"]
 
 # Mining disabled on mobile
 [mining]
@@ -713,7 +719,14 @@ fn start_network_with_context(context: Arc<Mutex<Context>>) -> Result<(), Box<dy
             
             add_log_message("Network thread started".to_string());
             add_log_message("Attempting to connect to bootstrap peers...".to_string());
-            add_log_message("Looking for peers at peer-v4.alfis.name:4244 and peer-v6.alfis.name:4244".to_string());
+            
+            // Log the actual peers from the configuration
+            if let Ok(ctx_guard) = context_clone.lock() {
+                let peer_list = ctx_guard.settings.net.peers.join(", ");
+                add_log_message(format!("Looking for peers at: {}", peer_list));
+            } else {
+                add_log_message("Attempting to connect to configured peers".to_string());
+            }
             
             let mut network = Network::new(context_clone);
             network.start();

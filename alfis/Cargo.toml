@@ -46,7 +46,7 @@ android_logger = "0.14"
 ureq = { version = "2.10", optional = true }
 
 # Local alfis dependency (path will be updated by build script)
-alfis = { path = "../", default-features = false }
+alfis = { path = "../../Alfis", default-features = false }
 
 [features]
 default = ["doh"]
