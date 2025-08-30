@@ -16,7 +16,7 @@ class BootReceiver : BroadcastReceiver() {
                 Log.d("AlfisBootReceiver", "Boot completed or package replaced")
                 
                 // Check if auto-start is enabled in preferences
-                val prefs = context.getSharedPreferences("alfis_prefs", Context.MODE_PRIVATE)
+                val prefs = context.getSharedPreferences("alfis_config", Context.MODE_PRIVATE)
                 val autoStart = prefs.getBoolean("auto_start", false)
                 
                 if (autoStart) {

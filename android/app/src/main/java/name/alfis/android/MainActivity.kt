@@ -330,7 +330,9 @@ fun ConfigurationSection(onListenAddressChanged: (String) -> Unit = {}) {
     val defaultListenAddress = "[::1]:5353"
     val defaultForwarders = "https://dns.adguard.com/dns-query\n8.8.8.8:53"
     val defaultPeers = "peer-v4.alfis.name:4244\npeer-v6.alfis.name:4244"
+    val defaultBootstraps = "8.8.8.8:53\n1.1.1.1:53"
     val defaultYggdrasilOnly = true
+    val defaultAutoStart = false
     
     // State for editable configuration (load from preferences)
     var listenAddress by remember { 
@@ -342,8 +344,14 @@ fun ConfigurationSection(onListenAddressChanged: (String) -> Unit = {}) {
     var peers by remember { 
         mutableStateOf(prefs.getString("peers", defaultPeers) ?: defaultPeers) 
     }
+    var bootstraps by remember { 
+        mutableStateOf(prefs.getString("bootstraps", defaultBootstraps) ?: defaultBootstraps) 
+    }
     var yggdrasilOnly by remember { 
         mutableStateOf(prefs.getBoolean("yggdrasil_only", defaultYggdrasilOnly)) 
+    }
+    var autoStart by remember { 
+        mutableStateOf(prefs.getBoolean("auto_start", defaultAutoStart)) 
     }
     
     Card(
@@ -358,22 +366,31 @@ fun ConfigurationSection(onListenAddressChanged: (String) -> Unit = {}) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             
-            // Alphabetical order: Forwarders, Listen Address, Peers
-            ConfigField(
-                label = "Forwarders",
-                value = forwarders,
-                onValueChange = { forwarders = it },
-                placeholder = "DNS forwarders (one per line)"
-            )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
+            // Configuration fields in dependency order
             ConfigField(
                 label = "Listen Address",
                 value = listenAddress,
                 onValueChange = { listenAddress = it },
                 placeholder = "IP:Port",
                 singleLine = true
+            )
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            ConfigField(
+                label = "Bootstraps",
+                value = bootstraps,
+                onValueChange = { bootstraps = it },
+                placeholder = "Bootstrap DNS servers (one per line)"
+            )
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            ConfigField(
+                label = "Forwarders",
+                value = forwarders,
+                onValueChange = { forwarders = it },
+                placeholder = "DNS forwarders (one per line)"
             )
             
             Spacer(modifier = Modifier.height(12.dp))
@@ -411,6 +428,32 @@ fun ConfigurationSection(onListenAddressChanged: (String) -> Unit = {}) {
                 )
             }
             
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            // Auto Start toggle
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "Auto Start on Boot",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "Automatically start Alfis DNS when device boots",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = autoStart,
+                    onCheckedChange = { autoStart = it }
+                )
+            }
+            
             Spacer(modifier = Modifier.height(16.dp))
             
             // Action buttons
@@ -424,7 +467,9 @@ fun ConfigurationSection(onListenAddressChanged: (String) -> Unit = {}) {
                         listenAddress = defaultListenAddress
                         forwarders = defaultForwarders
                         peers = defaultPeers
+                        bootstraps = defaultBootstraps
                         yggdrasilOnly = defaultYggdrasilOnly
+                        autoStart = defaultAutoStart
                         
                         // Show confirmation toast
                         android.widget.Toast.makeText(
@@ -447,7 +492,9 @@ fun ConfigurationSection(onListenAddressChanged: (String) -> Unit = {}) {
                             putString("listen_address", listenAddress)
                             putString("forwarders", forwarders)
                             putString("peers", peers)
+                            putString("bootstraps", bootstraps)
                             putBoolean("yggdrasil_only", yggdrasilOnly)
+                            putBoolean("auto_start", autoStart)
                             apply()
                         }
                         
@@ -464,7 +511,7 @@ check_blocks = 4
 # Network settings
 [net]
 # Bootstrap nodes
-peers = [${peers.split('\n').joinToString(", ") { "\"$it\"" }}]
+peers = [${peers.split('\n').filter { it.isNotBlank() }.joinToString(", ") { "\"${it.trim()}\"" }}]
 # Listen address (Android may restrict this)
 listen = "127.0.0.1:42440"
 # Mobile devices shouldn't be public peers
@@ -478,8 +525,8 @@ listen = "$listenAddress"
 # Increased threads for better performance
 threads = 8
 # Use DoH when available, fallback to regular DNS
-forwarders = [${forwarders.split('\n').joinToString(", ") { "\"$it\"" }}]
-bootstraps = ["8.8.8.8:53", "1.1.1.1:53"]
+forwarders = [${forwarders.split('\n').filter { it.isNotBlank() }.joinToString(", ") { "\"${it.trim()}\"" }}]
+bootstraps = [${bootstraps.split('\n').filter { it.isNotBlank() }.joinToString(", ") { "\"${it.trim()}\"" }}]
 
 # Mining disabled on mobile
 [mining]
