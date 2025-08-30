@@ -333,11 +333,11 @@ fun ConfigurationSection(onListenAddressChanged: (String) -> Unit = {}) {
     val prefs = context.getSharedPreferences("alfis_config", android.content.Context.MODE_PRIVATE)
     
     // Default configuration values
-    val defaultListenAddress = "[::1]:5353"
-    val defaultForwarders = "https://dns.adguard.com/dns-query\n8.8.8.8:53"
-    val defaultPeers = "peer-v4.alfis.name:4244\npeer-v6.alfis.name:4244"
+    val defaultListenAddress = "127.0.0.1:5353"
+    val defaultForwarders = "https://dns.adguard-dns.com/dns-query\nhttps://dns.quad9.net/dns-query"
+    val defaultPeers = "ns1.holz.gg:4244\nns2.holz.gg:4244"
     val defaultBootstraps = "94.140.14.14:53\n94.140.15.15:53\n9.9.9.9:53\n149.112.112.112:53\n[2a10:50c0::ad1:ff]:53\n[2a10:50c0::ad2:ff]:53\n[2620:fe::fe]:53\n[2620:fe::9]:53"
-    val defaultYggdrasilOnly = true
+    val defaultYggdrasilOnly = false
     val defaultAutoStart = false
     
     // State for editable configuration (load from preferences)
