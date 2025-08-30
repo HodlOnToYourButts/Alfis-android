@@ -24,7 +24,15 @@ class BootReceiver : BroadcastReceiver() {
                     val serviceIntent = Intent(context, AlfisDnsService::class.java).apply {
                         action = "START_DNS"
                     }
-                    context.startService(serviceIntent)
+                    try {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            context.startForegroundService(serviceIntent)
+                        } else {
+                            context.startService(serviceIntent)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("AlfisBootReceiver", "Failed to start service on boot: ${e.message}")
+                    }
                 } else {
                     Log.d("AlfisBootReceiver", "Auto-start disabled")
                 }
