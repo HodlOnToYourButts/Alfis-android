@@ -64,8 +64,16 @@ class AlfisDnsService : Service() {
     private fun startDnsService() {
         if (isRunning) return
 
+        // Ensure notification channel exists (important for boot scenarios)
+        createNotificationChannel()
+        
         val notification = createNotification("Starting Alfis DNS...", false)
-        startForeground(NOTIFICATION_ID, notification)
+        try {
+            startForeground(NOTIFICATION_ID, notification)
+        } catch (e: Exception) {
+            android.util.Log.e("AlfisDnsService", "Failed to start foreground service: ${e.message}")
+            // If we can't start as foreground service, we still try to continue but log the issue
+        }
 
         serviceScope.launch {
             try {

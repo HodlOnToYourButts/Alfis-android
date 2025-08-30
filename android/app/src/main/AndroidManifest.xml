@@ -20,6 +20,9 @@
     <!-- Boot receiver permission -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     
+    <!-- Permission to start foreground service from background (Android 10+) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_BOOT_COMPLETED" />
+    
     <!-- Storage for configuration and blockchain data -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />

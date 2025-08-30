@@ -317,6 +317,12 @@ fun AlfisMainScreen(modifier: Modifier = Modifier) {
         if (isServiceRunning && dnsStats.isNotEmpty()) {
             StatisticsSection(dnsStats = dnsStats)
         }
+        
+        // Debug boot auto-start section (only show if auto-start is enabled)
+        if (showConfig) {
+            Spacer(modifier = Modifier.height(16.dp))
+            BootAutoStartDebugSection()
+        }
 
     }
 }
@@ -830,6 +836,44 @@ fun InfoSection() {
                 style = MaterialTheme.typography.bodyMedium,
                 lineHeight = 20.sp
             )
+        }
+    }
+}
+
+@Composable
+fun BootAutoStartDebugSection() {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("alfis_config", android.content.Context.MODE_PRIVATE)
+    val autoStart = prefs.getBoolean("auto_start", false)
+    
+    if (autoStart) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "Boot Auto-Start Debug",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                
+                Text(
+                    text = "Auto-start on boot is ENABLED. If the DNS service doesn't start after reboot:\n\n" +
+                          "1. Check that Alfis is whitelisted in battery optimization settings\n" +
+                          "2. Enable 'Autostart' permission in your phone's app settings\n" +
+                          "3. Check logcat for 'AlfisBootReceiver' messages\n" +
+                          "4. Ensure the app has notification permissions\n\n" +
+                          "To test: Enable 'Auto Start on Boot', reboot device, and check if DNS service is running.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp
+                )
+            }
         }
     }
 }
