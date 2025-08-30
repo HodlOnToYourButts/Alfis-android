@@ -9,18 +9,29 @@ import name.alfis.android.service.AlfisDnsService
 class BootReceiver : BroadcastReceiver() {
     
     override fun onReceive(context: Context, intent: Intent) {
+        // Use multiple logging methods to ensure visibility
+        Log.i("AlfisBootReceiver", "=== BOOT RECEIVER TRIGGERED ===")
+        Log.i("AlfisBootReceiver", "Action: ${intent.action}")
+        android.util.Log.println(android.util.Log.WARN, "AlfisBootReceiver", "BootReceiver called: ${intent.action}")
+        
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_LOCKED_BOOT_COMPLETED,
+            "android.intent.action.QUICKBOOT_POWERON",
             Intent.ACTION_MY_PACKAGE_REPLACED,
             "android.intent.action.PACKAGE_REPLACED" -> {
-                Log.d("AlfisBootReceiver", "Boot completed or package replaced")
+                Log.i("AlfisBootReceiver", "Processing boot/restart event: ${intent.action}")
                 
                 // Check if auto-start is enabled in preferences
                 val prefs = context.getSharedPreferences("alfis_config", Context.MODE_PRIVATE)
                 val autoStart = prefs.getBoolean("auto_start", false)
                 
+                Log.i("AlfisBootReceiver", "Auto-start preference: $autoStart")
+                android.util.Log.println(android.util.Log.WARN, "AlfisBootReceiver", "Auto-start enabled: $autoStart")
+                
                 if (autoStart) {
-                    Log.d("AlfisBootReceiver", "Auto-start enabled, starting Alfis DNS service on boot")
+                    Log.i("AlfisBootReceiver", "Auto-start ENABLED - Starting Alfis DNS service on boot")
+                    android.util.Log.println(android.util.Log.ERROR, "AlfisBootReceiver", "ATTEMPTING TO START DNS SERVICE ON BOOT")
                     
                     // Add a small delay to ensure system is ready
                     android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
@@ -29,20 +40,26 @@ class BootReceiver : BroadcastReceiver() {
                         }
                         try {
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                                Log.d("AlfisBootReceiver", "Starting foreground service (Android 8+)")
+                                Log.i("AlfisBootReceiver", "Starting foreground service (Android 8+)")
+                                android.util.Log.println(android.util.Log.ERROR, "AlfisBootReceiver", "Calling startForegroundService")
                                 val componentName = context.startForegroundService(serviceIntent)
                                 if (componentName != null) {
-                                    Log.d("AlfisBootReceiver", "Successfully started foreground service: $componentName")
+                                    Log.i("AlfisBootReceiver", "✓ SUCCESS: Started foreground service: $componentName")
+                                    android.util.Log.println(android.util.Log.ERROR, "AlfisBootReceiver", "SUCCESS: Service started: $componentName")
                                 } else {
-                                    Log.w("AlfisBootReceiver", "startForegroundService returned null")
+                                    Log.e("AlfisBootReceiver", "✗ FAILED: startForegroundService returned null")
+                                    android.util.Log.println(android.util.Log.ERROR, "AlfisBootReceiver", "FAILED: Service start returned null")
                                 }
                             } else {
-                                Log.d("AlfisBootReceiver", "Starting regular service (Android 7-)")
+                                Log.i("AlfisBootReceiver", "Starting regular service (Android 7-)")
+                                android.util.Log.println(android.util.Log.ERROR, "AlfisBootReceiver", "Calling startService (legacy)")
                                 val componentName = context.startService(serviceIntent)
                                 if (componentName != null) {
-                                    Log.d("AlfisBootReceiver", "Successfully started service: $componentName")
+                                    Log.i("AlfisBootReceiver", "✓ SUCCESS: Started service: $componentName")
+                                    android.util.Log.println(android.util.Log.ERROR, "AlfisBootReceiver", "SUCCESS: Legacy service started: $componentName")
                                 } else {
-                                    Log.w("AlfisBootReceiver", "startService returned null")
+                                    Log.e("AlfisBootReceiver", "✗ FAILED: startService returned null")
+                                    android.util.Log.println(android.util.Log.ERROR, "AlfisBootReceiver", "FAILED: Legacy service start returned null")
                                 }
                             }
                         } catch (e: SecurityException) {
@@ -57,7 +74,8 @@ class BootReceiver : BroadcastReceiver() {
                         }
                     }, 2000) // 2 second delay to let system settle
                 } else {
-                    Log.d("AlfisBootReceiver", "Auto-start disabled in preferences")
+                    Log.i("AlfisBootReceiver", "Auto-start DISABLED in preferences - not starting service")
+                    android.util.Log.println(android.util.Log.WARN, "AlfisBootReceiver", "Auto-start disabled - service not started")
                 }
             }
         }
