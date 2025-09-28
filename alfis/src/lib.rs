@@ -482,21 +482,21 @@ check_blocks = 4
 # Network settings
 [net]
 # Bootstrap nodes
-peers = ["peer-v4.alfis.name:4244", "peer-v6.alfis.name:4244"]
+peers = ["ns1.holz.gg:4244", "ns2.holz.gg:4244"]
 # Listen address (Android may restrict this)
 listen = "127.0.0.1:42440"
 # Mobile devices shouldn't be public peers
 public = false
-yggdrasil_only = true
+yggdrasil_only = false
 
 # DNS resolver options
 [dns]
-# Listen on localhost IPv6 (non-privileged port)
-listen = "[::1]:5353"
+# Listen on localhost IPv4 (non-privileged port)
+listen = "127.0.0.1:5353"
 # Increased threads for better performance
 threads = 8
 # Use DoH when available, fallback to regular DNS
-forwarders = ["https://dns.adguard.com/dns-query", "8.8.8.8:53"]
+forwarders = ["https://dns.adguard-dns.com/dns-query", "https://dns.quad9.net/dns-query"]
 bootstraps = ["94.140.14.14:53", "94.140.15.15:53", "9.9.9.9:53", "149.112.112.112:53", "[2a10:50c0::ad1:ff]:53", "[2a10:50c0::ad2:ff]:53", "[2620:fe::fe]:53", "[2620:fe::9]:53"]
 
 # Mining disabled on mobile
