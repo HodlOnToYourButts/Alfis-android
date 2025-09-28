@@ -68,17 +68,23 @@ jobs:
     - name: Build APK using build script
       run: |
         chmod +x build.sh
+        export JAVA_HOME=$JAVA_HOME
+        export GRADLE_OPTS="-Dorg.gradle.java.home=$JAVA_HOME"
         ./build.sh
 
     - name: Build Release APK
       run: |
         cd android
+        export JAVA_HOME=$JAVA_HOME
+        export GRADLE_OPTS="-Dorg.gradle.java.home=$JAVA_HOME"
         ./gradlew assembleRelease
 
     - name: Sign APK (if keystore available)
       if: env.KEYSTORE_FILE != ''
       run: |
         cd android
+        export JAVA_HOME=$JAVA_HOME
+        export GRADLE_OPTS="-Dorg.gradle.java.home=$JAVA_HOME"
         echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > app/keystore.jks
         ./gradlew assembleRelease \
           -Pandroid.injected.signing.store.file=app/keystore.jks \
